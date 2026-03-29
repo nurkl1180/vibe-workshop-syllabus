@@ -1,0 +1,597 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:var(--color-background-primary);
+    --bg2:var(--color-background-secondary);
+    --bg3:var(--color-background-tertiary);
+    --border:var(--color-border-tertiary);
+    --border2:var(--color-border-secondary);
+    --txt:var(--color-text-primary);
+    --txt2:var(--color-text-secondary);
+    --txt3:var(--color-text-tertiary);
+    --d1a:#0F6E56;--d1b:#1D9E75;--d1c:#E1F5EE;--d1t:#04342C;
+    --d2a:#534AB7;--d2b:#7F77DD;--d2c:#EEEDFE;--d2t:#26215C;
+    --acc1:#0F6E56;--acc2:#534AB7;
+  }
+  body{font-family:'Inter',sans-serif;color:var(--txt);background:transparent;padding:0 0 1rem}
+  .header{padding:1.5rem 1.5rem 1rem;border-bottom:0.5px solid var(--border)}
+  .badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.08em;padding:3px 8px;border-radius:4px;margin-bottom:.5rem}
+  .b-hrdc{background:#FFF3CD;color:#7D5A00}
+  .b-2day{background:var(--d1c);color:var(--d1t)}
+  .b-cc{background:var(--d2c);color:var(--d2t)}
+  h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.2;margin:.4rem 0 .3rem}
+  .subtitle{font-size:13px;color:var(--txt2);line-height:1.5}
+  .meta{display:flex;gap:1rem;margin-top:.75rem;flex-wrap:wrap}
+  .meta-chip{font-size:12px;color:var(--txt2);display:flex;align-items:center;gap:4px}
+  .meta-chip svg{opacity:.6}
+
+  .tabs{display:flex;border-bottom:0.5px solid var(--border);padding:0 1.5rem}
+  .tab{font-size:13px;font-weight:500;padding:.65rem 1rem;cursor:pointer;border-bottom:2px solid transparent;color:var(--txt2);transition:all .2s;white-space:nowrap}
+  .tab.active.d1{border-color:var(--d1a);color:var(--d1a)}
+  .tab.active.d2{border-color:var(--d2a);color:var(--d2a)}
+  .tab:hover:not(.active){color:var(--txt);border-color:var(--border2)}
+
+  .panel{display:none;padding:1.25rem 1.5rem}
+  .panel.active{display:block}
+
+  .day-banner{border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem}
+  .d1-banner{background:linear-gradient(135deg,#E1F5EE,#9FE1CB22);border:0.5px solid #5DCAA5}
+  .d2-banner{background:linear-gradient(135deg,#EEEDFE,#AFA9EC22);border:0.5px solid #7F77DD}
+  .day-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.1em;opacity:.7;margin-bottom:.2rem}
+  .day-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;line-height:1.2}
+  .day-tools{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+  .tool-pill{font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;border:0.5px solid}
+  .tp-green{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+  .tp-purple{background:#EEEDFE;color:#534AB7;border-color:#AFA9AB}
+  .tp-gray{background:var(--bg2);color:var(--txt2);border-color:var(--border2)}
+
+  .session{margin-bottom:1rem;border:0.5px solid var(--border);border-radius:10px;overflow:hidden}
+  .session-header{padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;user-select:none;background:var(--bg)}
+  .session-header:hover{background:var(--bg2)}
+  .s-time{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--txt3);min-width:80px}
+  .s-label{font-size:13px;font-weight:600;flex:1;line-height:1.3}
+  .s-type{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .st-lecture{background:var(--bg3);color:var(--txt2);border:0.5px solid var(--border)}
+  .st-hands{background:#E1F5EE;color:#0F6E56;border:0.5px solid #9FE1CB}
+  .st-hands2{background:#EEEDFE;color:#534AB7;border:0.5px solid #CECBF6}
+  .st-break{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775}
+  .chevron{transition:transform .25s;color:var(--txt3);flex-shrink:0}
+  .chevron.open{transform:rotate(180deg)}
+  .session-body{display:none;padding:0 1rem .9rem;border-top:0.5px solid var(--border);background:var(--bg)}
+  .session-body.open{display:block}
+  .topic-list{list-style:none;margin-top:.65rem}
+  .topic-list li{font-size:13px;color:var(--txt2);padding:.28rem 0;display:flex;align-items:flex-start;gap:.5rem;line-height:1.45}
+  .topic-list li::before{content:'';display:block;width:5px;height:5px;border-radius:50%;margin-top:.45rem;flex-shrink:0}
+  .li-d1::before{background:var(--d1a)}
+  .li-d2::before{background:var(--d2a)}
+  .exercise-card{margin-top:.75rem;border-radius:8px;padding:.75rem 1rem;border:0.5px solid}
+  .ec-d1{background:#E1F5EE;border-color:#5DCAA5}
+  .ec-d2{background:#EEEDFE;border-color:#AFA9EC}
+  .ec-label{font-size:10px;font-weight:600;letter-spacing:.08em;margin-bottom:.3rem}
+  .ec-d1 .ec-label{color:var(--d1a)}
+  .ec-d2 .ec-label{color:var(--d2a)}
+  .ec-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:.2rem}
+  .ec-desc{font-size:12px;color:var(--txt2);line-height:1.5}
+  .stack-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+  .stack-tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--txt2);border:0.5px solid var(--border);font-family:'DM Mono',monospace}
+
+  .stack-overview{border:0.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+  .so-header{padding:.65rem 1rem;background:var(--bg2);border-bottom:0.5px solid var(--border);font-size:12px;font-weight:600;color:var(--txt2);letter-spacing:.06em}
+  .so-row{display:flex;align-items:center;gap:.75rem;padding:.55rem 1rem;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
+  .so-row:last-child{border-bottom:none}
+  .so-cat{font-size:11px;font-weight:600;color:var(--txt2);min-width:90px;flex-shrink:0}
+  .so-items{display:flex;flex-wrap:wrap;gap:.35rem}
+
+  .outcome-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem;margin-top:.5rem}
+  .outcome-card{border-radius:8px;padding:.7rem .85rem;border:0.5px solid var(--border);background:var(--bg2)}
+  .oc-icon{font-size:16px;margin-bottom:.3rem}
+  .oc-text{font-size:12px;color:var(--txt2);line-height:1.4}
+
+  .divider{display:flex;align-items:center;gap:.5rem;margin:.75rem 0;font-size:11px;color:var(--txt3);font-weight:500;letter-spacing:.06em}
+  .divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+</style>
+
+<div class="header">
+  <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem">
+    <span class="badge b-hrdc">HRDC CLAIMABLE</span>
+    <span class="badge b-2day">2-DAY WORKSHOP</span>
+    <span class="badge b-cc" style="background:var(--d2c);color:var(--d2t)">MANAGERS & EXECUTIVES</span>
+  </div>
+  <h1>Build With AI: Vibe Coding for<br>Working Professionals</h1>
+  <p class="subtitle">From zero code to working app — in two days. No CS degree required.<br>Alternative title considered: <em>AI App Builder Bootcamp: From Idea to Launch</em></p>
+  <div class="meta">
+    <span class="meta-chip">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 4.5V8.5L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      16 hours contact time
+    </span>
+    <span class="meta-chip">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4M2 7h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      2 consecutive days
+    </span>
+    <span class="meta-chip">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.24 2 3 4.24 3 7c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+      Max 20 pax
+    </span>
+    <span class="meta-chip">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      3 hands-on app builds
+    </span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active d1" onclick="switchTab('d1')">Day 1 — Foundations & First App</div>
+  <div class="tab d2" onclick="switchTab('d2')">Day 2 — Agentic Builds & Deployment</div>
+  <div class="tab" onclick="switchTab('stack')">Tech Stack</div>
+  <div class="tab" onclick="switchTab('outcomes')">Learning Outcomes</div>
+</div>
+
+<!-- DAY 1 -->
+<div class="panel active" id="panel-d1">
+  <div class="day-banner d1-banner">
+    <div>
+      <div class="day-label">DAY ONE</div>
+      <div class="day-title">Vibe Coding Foundations<br>with Lovable & Google AI Studio</div>
+    </div>
+    <div class="day-tools">
+      <span class="tool-pill tp-green">Lovable</span>
+      <span class="tool-pill tp-green">Google AI Studio</span>
+      <span class="tool-pill tp-gray">Gemini 2.5 Pro</span>
+      <span class="tool-pill tp-gray">GitHub</span>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">09:00–09:45</span>
+      <span class="s-label">Welcome & The Vibe Coding Mindset</span>
+      <span class="s-type st-lecture">Orientation</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d1">What is vibe coding — and why non-coders are now the best prompt engineers</li>
+        <li class="li-d1">The professional's unfair advantage: domain knowledge + AI = real tools</li>
+        <li class="li-d1">AI coding vs traditional development: speed, cost, trade-offs</li>
+        <li class="li-d1">What we will build over 2 days — app showcase walkthrough</li>
+        <li class="li-d1">Setting up: Lovable account, Google AI Studio, GitHub, Vercel (guided)</li>
+        <li class="li-d1">The golden rules: iterate fast, commit often, never fear breaking things</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">09:45–11:00</span>
+      <span class="s-label">Module 1 — How AI Builds Apps: The Mental Model</span>
+      <span class="s-type st-lecture">Core Concepts</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d1">How LLMs generate code — tokens, context windows, instruction-following</li>
+        <li class="li-d1">Frontend vs backend vs database — explained for non-techies (analogy: shopfront, kitchen, filing cabinet)</li>
+        <li class="li-d1">What Lovable does under the hood: React, Supabase, Tailwind — demystified</li>
+        <li class="li-d1">Prompt anatomy for app building: role + task + constraints + format</li>
+        <li class="li-d1">The iteration loop: build → review → fix → ship</li>
+        <li class="li-d1">Common failure modes and how to recover (hallucinations, broken logic, scope creep)</li>
+        <li class="li-d1">Live demo: trainer builds a mini app from scratch in real-time (~15 min)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">11:00–11:15</span>
+      <span class="s-label">Break</span>
+      <span class="s-type st-break">Break</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">Refreshment break. Pre-load Lovable project template before returning.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">11:15–13:00</span>
+      <span class="s-label">HANDS-ON #1 — Build a Team Dashboard with Lovable</span>
+      <span class="s-type st-hands">Exercise 1</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <div class="exercise-card ec-d1">
+        <div class="ec-label">EXERCISE 1 OF 3 · LOVABLE</div>
+        <div class="ec-title">My Team's Weekly Status Tracker</div>
+        <div class="ec-desc">Build a lightweight internal dashboard where team members can log weekly priorities, blockers, and wins. No backend required — localStorage persistence. Participants customise for their own team context.</div>
+        <div class="stack-row">
+          <span class="stack-tag">Lovable</span>
+          <span class="stack-tag">React</span>
+          <span class="stack-tag">Tailwind CSS</span>
+          <span class="stack-tag">localStorage</span>
+        </div>
+      </div>
+      <ul class="topic-list" style="margin-top:.7rem">
+        <li class="li-d1">Step 1: Describe your dashboard in plain English — trainer models a strong prompt</li>
+        <li class="li-d1">Step 2: Lovable generates the first version — group review of what worked / what didn't</li>
+        <li class="li-d1">Step 3: Iterate — add filtering, colour-coding, a summary view</li>
+        <li class="li-d1">Step 4: Deploy to Vercel — participants own a live URL by lunchtime</li>
+        <li class="li-d1">Best practice focus: prompt specificity, one feature per prompt, reading error messages</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">13:00–14:00</span>
+      <span class="s-label">Lunch</span>
+      <span class="s-type st-break">Lunch</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">60-min lunch. Afternoon focus shifts to Google AI Studio and multimodal inputs.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">14:00–15:00</span>
+      <span class="s-label">Module 2 — Google AI Studio & Multimodal Prompting</span>
+      <span class="s-type st-lecture">Core Concepts</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d1">Google AI Studio walkthrough: models, API key, system prompts, temperature settings</li>
+        <li class="li-d1">Gemini 2.5 Pro capabilities: long context (1M tokens), multimodal input (images, PDFs, audio)</li>
+        <li class="li-d1">When to use AI Studio vs Lovable vs Claude — choosing the right tool</li>
+        <li class="li-d1">System prompt design: persona, constraints, output format, few-shot examples</li>
+        <li class="li-d1">Multimodal prompting: feeding documents, screenshots, diagrams to the model</li>
+        <li class="li-d1">Connecting AI Studio to Lovable via API — the integration pattern explained</li>
+        <li class="li-d1">API keys, rate limits, cost management — what every manager should know</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">15:00–15:15</span>
+      <span class="s-label">Break</span>
+      <span class="s-type st-break">Break</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">Short break. Pre-load AI Studio template for Exercise 2.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">15:15–16:45</span>
+      <span class="s-label">HANDS-ON #2 — AI-Powered Document Analyser (AI Studio + Lovable)</span>
+      <span class="s-type st-hands">Exercise 2</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <div class="exercise-card ec-d1">
+        <div class="ec-label">EXERCISE 2 OF 3 · AI STUDIO + LOVABLE</div>
+        <div class="ec-title">Smart Report Summariser & Q&A Tool</div>
+        <div class="ec-desc">Build a web app where users upload a PDF (annual report, policy doc, contract) and can ask questions about it in plain language. Uses Gemini 2.5 Pro's long-context PDF reading via AI Studio API, with a Lovable-built frontend.</div>
+        <div class="stack-row">
+          <span class="stack-tag">Google AI Studio</span>
+          <span class="stack-tag">Gemini 2.5 Pro</span>
+          <span class="stack-tag">Lovable</span>
+          <span class="stack-tag">PDF API</span>
+          <span class="stack-tag">Vercel</span>
+        </div>
+      </div>
+      <ul class="topic-list" style="margin-top:.7rem">
+        <li class="li-d1">Configure system prompt in AI Studio for the document analyst persona</li>
+        <li class="li-d1">Wire the AI Studio API key into Lovable's environment variables</li>
+        <li class="li-d1">Build upload interface + chat UI in Lovable</li>
+        <li class="li-d1">Test with a real business document (participants bring their own)</li>
+        <li class="li-d1">Best practice: prompt injection risks, data privacy considerations, disclaimers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">16:45–17:00</span>
+      <span class="s-label">Day 1 Wrap-Up & Homework Challenge</span>
+      <span class="s-type st-lecture">Closing</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d1">Showcase: 3 volunteers demo their deployed apps</li>
+        <li class="li-d1">Homework: iterate your Exercise 1 or 2 app with one new feature overnight</li>
+        <li class="li-d1">Preview of Day 2: Claude Code, terminal, and agentic workflows</li>
+        <li class="li-d1">Optional reading: Claude Code docs, MCP overview</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DAY 2 -->
+<div class="panel" id="panel-d2">
+  <div class="day-banner d2-banner">
+    <div>
+      <div class="day-label">DAY TWO</div>
+      <div class="day-title">Agentic Builds & Real Deployment<br>with Claude Code</div>
+    </div>
+    <div class="day-tools">
+      <span class="tool-pill tp-purple">Claude Code</span>
+      <span class="tool-pill tp-purple">Claude API</span>
+      <span class="tool-pill tp-gray">Supabase</span>
+      <span class="tool-pill tp-gray">Vercel</span>
+      <span class="tool-pill tp-gray">MCP</span>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">09:00–09:20</span>
+      <span class="s-label">Day 2 Kickoff — Homework Showcase & Recap</span>
+      <span class="s-type st-lecture">Orientation</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d2">Homework showcase: 5-min open floor for overnight iterations</li>
+        <li class="li-d2">Quick recap: what Lovable does well, where it hits walls</li>
+        <li class="li-d2">Today's promise: build a production-grade app that Lovable can't do alone</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">09:20–10:30</span>
+      <span class="s-label">Module 3 — Claude Code: Your AI Pair Programmer</span>
+      <span class="s-type st-lecture">Core Concepts</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d2">What Claude Code is — agentic coding in the terminal, not just a chat window</li>
+        <li class="li-d2">Installation and setup: Node.js, npm, API key — step-by-step (pre-installed on lab machines)</li>
+        <li class="li-d2">The CLAUDE.md file — your project brief that Claude reads every session</li>
+        <li class="li-d2">Agentic loops: how Claude plans, writes, tests, and fixes code autonomously</li>
+        <li class="li-d2">Model Context Protocol (MCP) — what it is and why it matters (Supabase, GitHub MCPs)</li>
+        <li class="li-d2">Claude Code vs Lovable vs Cursor — when to reach for each</li>
+        <li class="li-d2">Live demo: trainer runs Claude Code on an existing Lovable project — upgrades it in real-time</li>
+        <li class="li-d2">Cost and token management — setting budget limits, using /compact, monitoring usage</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">10:30–10:45</span>
+      <span class="s-label">Break</span>
+      <span class="s-type st-break">Break</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">Short break. Ensure Claude Code is verified on all lab machines.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">10:45–13:00</span>
+      <span class="s-label">HANDS-ON #3 — Build an AI-Powered Business Tool with Claude Code</span>
+      <span class="s-type st-hands2">Exercise 3</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <div class="exercise-card ec-d2">
+        <div class="ec-label">EXERCISE 3 OF 3 · CLAUDE CODE — CAPSTONE</div>
+        <div class="ec-title">AI Meeting Notes → Action Tracker</div>
+        <div class="ec-desc">Build a full-stack app: paste or upload meeting notes → Claude API extracts action items, owners, deadlines → stored in Supabase → viewable dashboard with status tracking. Each participant customises for their own meeting type (board, ops, project).</div>
+        <div class="stack-row">
+          <span class="stack-tag">Claude Code</span>
+          <span class="stack-tag">Claude API</span>
+          <span class="stack-tag">Supabase</span>
+          <span class="stack-tag">React/Vite</span>
+          <span class="stack-tag">Vercel</span>
+          <span class="stack-tag">MCP</span>
+        </div>
+      </div>
+      <ul class="topic-list" style="margin-top:.7rem">
+        <li class="li-d2">Write the CLAUDE.md project brief — trainer templates, participants adapt</li>
+        <li class="li-d2">Claude Code scaffolds the full project structure from the brief</li>
+        <li class="li-d2">Connect Supabase via MCP — Claude Code creates tables, RLS policies, inserts test data</li>
+        <li class="li-d2">Wire Claude API for extraction — prompt engineering for structured JSON output</li>
+        <li class="li-d2">Build and iterate the dashboard — add filters, priority tags, export</li>
+        <li class="li-d2">Git commit workflow and Vercel deployment — push to production</li>
+        <li class="li-d2">Security checklist: env vars, .gitignore, never commit API keys</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">13:00–14:00</span>
+      <span class="s-label">Lunch</span>
+      <span class="s-type st-break">Lunch</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">60-min lunch. Afternoon covers best practices, governance, and career applications.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">14:00–15:00</span>
+      <span class="s-label">Module 4 — Best Practices, Security & Responsible Vibe Coding</span>
+      <span class="s-type st-lecture">Core Concepts</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d2">The vibe coder's security checklist: API keys, environment variables, .gitignore</li>
+        <li class="li-d2">Data classification — what should (and should NOT) go into a vibe-coded app</li>
+        <li class="li-d2">AI hallucinations in code: how to spot them, test for them, mitigate them</li>
+        <li class="li-d2">When to involve your IT/security team — the manager's escalation rule</li>
+        <li class="li-d2">Malaysian legal and compliance context: PDPA, sector-specific data rules</li>
+        <li class="li-d2">Intellectual property: who owns AI-generated code? (practical guidance)</li>
+        <li class="li-d2">From prototype to production: when to hand off to a developer</li>
+        <li class="li-d2">Cost management: Anthropic, Google, Supabase, Vercel pricing tiers explained</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">15:00–15:15</span>
+      <span class="s-label">Break</span>
+      <span class="s-type st-break">Break</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body"><p style="font-size:13px;color:var(--txt2);padding:.3rem 0">Short break before final module and showcase.</p></div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">15:15–16:15</span>
+      <span class="s-label">Module 5 — Your AI App Roadmap: What to Build Next</span>
+      <span class="s-type st-lecture">Strategy</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d2">Identifying your highest-value app idea: the time-cost-repeatability matrix</li>
+        <li class="li-d2">Vertical use cases: operations, HR, finance, sales, compliance — live examples per industry</li>
+        <li class="li-d2">Ecosystem map: Lovable, Claude Code, n8n, Make, Notion — when each fits</li>
+        <li class="li-d2">Pitching AI tools internally — the ROI framing your CFO will understand</li>
+        <li class="li-d2">Resources: Claude.ai, Anthropic docs, Lovable Discord, Google AI Studio blog</li>
+        <li class="li-d2">Your 30-day post-workshop challenge: one shipped app</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="session-header" onclick="toggle(this)">
+      <span class="s-time">16:15–17:00</span>
+      <span class="s-label">Capstone Showcase, Certificate & Closing</span>
+      <span class="s-type st-lecture">Closing</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="session-body">
+      <ul class="topic-list">
+        <li class="li-d2">Live demos: each participant (or pair) presents their capstone app — 3 min max</li>
+        <li class="li-d2">Peer voting: Most Useful, Most Creative, Best Prompt Engineering</li>
+        <li class="li-d2">Group photo with QR codes to live apps</li>
+        <li class="li-d2">HRDC certificate distribution and feedback form</li>
+        <li class="li-d2">Trainer's closing: the future belongs to domain experts who can build</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="panel" id="panel-stack">
+  <p style="font-size:13px;color:var(--txt2);margin-bottom:1rem;line-height:1.5">All tools are free-tier accessible. Participants use pre-configured lab accounts on Day 1; bring their own accounts from Day 2.</p>
+  <div class="stack-overview">
+    <div class="so-header">TECH STACK AT A GLANCE</div>
+    <div class="so-row">
+      <span class="so-cat">AI Builder</span>
+      <div class="so-items">
+        <span class="stack-tag" style="background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5">Lovable</span>
+        <span class="stack-tag" style="background:#EEEDFE;color:#534AB7;border-color:#CECBF6">Claude Code</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">AI Models</span>
+      <div class="so-items">
+        <span class="stack-tag">Gemini 2.5 Pro (AI Studio)</span>
+        <span class="stack-tag">Claude Sonnet 4 (API)</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">Frontend</span>
+      <div class="so-items">
+        <span class="stack-tag">React</span>
+        <span class="stack-tag">Vite</span>
+        <span class="stack-tag">Tailwind CSS</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">Backend / DB</span>
+      <div class="so-items">
+        <span class="stack-tag">Supabase (Postgres)</span>
+        <span class="stack-tag">MCP (Supabase connector)</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">Deployment</span>
+      <div class="so-items">
+        <span class="stack-tag">Vercel</span>
+        <span class="stack-tag">GitHub</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">API Keys Needed</span>
+      <div class="so-items">
+        <span class="stack-tag">Anthropic API</span>
+        <span class="stack-tag">Google AI Studio API</span>
+        <span class="stack-tag">Supabase project URL + anon key</span>
+      </div>
+    </div>
+    <div class="so-row">
+      <span class="so-cat">Pre-requisites</span>
+      <div class="so-items">
+        <span class="stack-tag">Node.js v18+ (lab pre-installed)</span>
+        <span class="stack-tag">Chrome browser</span>
+        <span class="stack-tag">GitHub account</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--txt3);line-height:1.6">Note for HRDC submission: all software tools used are free-tier or trial. Estimated personal API spend per participant over 2 days: RM 5–15. Trainer pre-allocates a shared API key for Day 1 exercises to ensure zero friction onboarding.</p>
+</div>
+
+<!-- OUTCOMES -->
+<div class="panel" id="panel-outcomes">
+  <p style="font-size:13px;color:var(--txt2);margin-bottom:1rem;line-height:1.5">By the end of Day 2, participants will be able to:</p>
+  <div class="outcome-grid">
+    <div class="outcome-card"><div class="oc-icon">🧠</div><div class="oc-text">Explain how AI coding tools work to non-technical and technical colleagues</div></div>
+    <div class="outcome-card"><div class="oc-icon">🔨</div><div class="oc-text">Build and deploy a working web app using Lovable without writing code</div></div>
+    <div class="outcome-card"><div class="oc-icon">⚡</div><div class="oc-text">Use Claude Code in the terminal to build, debug, and extend a codebase</div></div>
+    <div class="outcome-card"><div class="oc-icon">🗄️</div><div class="oc-text">Connect a real database (Supabase) and AI model (Claude API) to a live app</div></div>
+    <div class="outcome-card"><div class="oc-icon">🔐</div><div class="oc-text">Apply security best practices: env vars, data classification, PDPA awareness</div></div>
+    <div class="outcome-card"><div class="oc-icon">📊</div><div class="oc-text">Identify high-value app ideas in their own role using the time-cost matrix</div></div>
+    <div class="outcome-card"><div class="oc-icon">🚀</div><div class="oc-text">Ship 3 apps to a live URL over 2 days — with their name in the commit history</div></div>
+    <div class="outcome-card"><div class="oc-icon">💬</div><div class="oc-text">Pitch AI tool investments to leadership using ROI and risk framing</div></div>
+  </div>
+  <div class="divider" style="margin-top:1.25rem">WHO THIS IS FOR</div>
+  <p style="font-size:13px;color:var(--txt2);line-height:1.7">Managers and senior executives with no coding background across any industry. Ideal for: operations, finance, HR, compliance, strategy, and commercial roles. Participants should be comfortable with Microsoft Office and willing to type in a terminal with guidance. Prior AI chatbot experience helpful but not required.</p>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active','d1','d2'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const map = {d1:'Day 1 — Foundations & First App',d2:'Day 2 — Agentic Builds & Deployment',stack:'Tech Stack',outcomes:'Learning Outcomes'};
+  document.querySelectorAll('.tab').forEach(t => {
+    if(t.textContent.trim().startsWith(map[id]?.split('—')[0]?.trim() ?? map[id])) {
+      t.classList.add('active');
+      if(id==='d1') t.classList.add('d1');
+      if(id==='d2') t.classList.add('d2');
+    }
+  });
+  // simpler approach
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => t.classList.remove('active','d1','d2'));
+  const panels = document.querySelectorAll('.panel');
+  panels.forEach(p => p.classList.remove('active'));
+  const idx = ['d1','d2','stack','outcomes'].indexOf(id);
+  if(idx>=0){
+    tabs[idx].classList.add('active');
+    if(id==='d1') tabs[idx].classList.add('d1');
+    if(id==='d2') tabs[idx].classList.add('d2');
+    panels[idx].classList.add('active');
+  }
+}
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+</script>
